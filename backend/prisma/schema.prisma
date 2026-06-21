@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model area {
+  id          String        @id @default(uuid())
+  nombre      String
+  descripcion String?
+  reportes    incidencia[]
+  usuarios    usuario[]
+}
+
+model usuario {
+  id          String   @id @default(uuid())
+  nombre      String
+  correo      String   @unique
+  password    String
+  telefono    String?
+  rol         String   @default("USUARIO")
+  activo      Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  areaId      String?
+  fotoPerfil  String?  @db.LongText
+  pushToken   String?  @db.Text
+  area        area?    @relation(fields: [areaId], references: [id])
+  
+  reportes_creados    incidencia[]   @relation("usuario_creador")
+  reportes_asignados  incidencia[]   @relation("tecnico_asignado")
+  asignaciones        asignacion[]   @relation("asignaciones_tecnico")
+  comentarios         comentario[]
+  evidencias          evidencia[]
+  notificaciones      notificacion[]
+  seguimientos        seguimiento[]
+  passwordResets passwordReset[]
+
+  @@index([areaId], map: "usuario_areaId_fkey")
+}
+
+model incidencia {
+  id                String              @id @default(uuid())
+  titulo            String
+  descripcion       String
+  fechaHora         DateTime            @default(now())
+  fechaResolucion   DateTime?
+  usuarioId         String
+  tecnicoAsignadoId String?
+  categoria         categoriaIncidencia @default(OTRO)
+  prioridad         prioridad           @default(MEDIA)
+  estado            estadoIncidencia    @default(RECIBIDO)
+  ubicacion         String?
+  equipo            String?
+  areaId            String?
+  diagnostico       String?             @db.Text
+  
+  area            area?               @relation(fields: [areaId], references: [id])
+  tecnicoAsignado usuario?            @relation("tecnico_asignado", fields: [tecnicoAsignadoId], references: [id])
+  usuario         usuario             @relation("usuario_creador", fields: [usuarioId], references: [id])
+  asignaciones    asignacion[]
+  comentarios     comentario[]
+  evidencias      evidencia[]
+  notificaciones  notificacion[]
+  seguimientos    seguimiento[]
+
+  @@index([areaId], map: "incidencia_areaId_fkey")
+  @@index([tecnicoAsignadoId], map: "incidencia_tecnicoAsignadoId_fkey")
+  @@index([usuarioId], map: "incidencia_usuarioId_fkey")
+}
+
+model evidencia {
+  id           String          @id @default(uuid())
+  incidenciaId String
+  usuarioId    String
+  tipo         tipoEvidencia   @default(PROBLEMA)
+  urlFoto      String          @db.LongText
+  descripcion  String?
+  fechaSubida  DateTime        @default(now())
+  
+  incidencia incidencia @relation(fields: [incidenciaId], references: [id])
+  usuario    usuario    @relation(fields: [usuarioId], references: [id])
+
+  @@index([incidenciaId], map: "evidencia_incidenciaId_fkey")
+  @@index([usuarioId], map: "evidencia_usuarioId_fkey")
+}
+
+model comentario {
+  id              String     @id @default(uuid())
+  usuarioId       String
+  fechaComentario DateTime   @default(now())
+  contenido       String
+  incidenciaId    String
+  
+  incidencia incidencia @relation(fields: [incidenciaId], references: [id])
+  usuario    usuario    @relation(fields: [usuarioId], references: [id])
+
+  @@index([incidenciaId], map: "comentario_incidenciaId_fkey")
+  @@index([usuarioId], map: "comentario_usuarioId_fkey")
+}
+
+model notificacion {
+  id           String      @id @default(uuid())
+  usuarioId    String
+  mensaje      String
+  fechaEnvio   DateTime    @default(now())
+  leido        Boolean     @default(false)
+  incidenciaId String?
+  
+  incidencia incidencia? @relation(fields: [incidenciaId], references: [id])
+  usuario    usuario     @relation(fields: [usuarioId], references: [id])
+
+  @@index([incidenciaId], map: "notificacion_incidenciaId_fkey")
+  @@index([usuarioId], map: "notificacion_usuarioId_fkey")
+}
+
+model seguimiento {
+  id             String            @id @default(uuid())
+  incidenciaId   String
+  usuarioId      String
+  accion         String
+  descripcion    String?
+  estadoAnterior estadoIncidencia?
+  estadoNuevo    estadoIncidencia?
+  fecha          DateTime          @default(now())
+  
+  incidencia incidencia @relation(fields: [incidenciaId], references: [id])
+  usuario    usuario    @relation(fields: [usuarioId], references: [id])
+
+  @@index([incidenciaId], map: "seguimiento_incidenciaId_fkey")
+  @@index([usuarioId], map: "seguimiento_usuarioId_fkey")
+}
+
+model asignacion {
+  id              String     @id @default(uuid())
+  tecnicoId       String
+  fechaAsignacion DateTime   @default(now())
+  incidenciaId    String
+  
+  incidencia incidencia @relation(fields: [incidenciaId], references: [id])
+  tecnico    usuario    @relation("asignaciones_tecnico", fields: [tecnicoId], references: [id])
+
+  @@unique([incidenciaId, tecnicoId])
+  @@index([tecnicoId], map: "asignacion_tecnicoId_fkey")
+}
+
+model passwordReset {
+  id        String   @id @default(uuid())
+  
+  usuarioId String
+  usuario   usuario  @relation(fields: [usuarioId], references: [id])
+
+  email     String
+  token     String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@unique([email])
+  @@index([usuarioId])
+}
+enum categoriaIncidencia {
+  HARDWARE
+  SOFTWARE
+  RED
+  OTRO
+}
+
+enum prioridad {
+  BAJA
+  MEDIA
+  ALTA
+  CRITICA
+}
+
+enum estadoIncidencia {
+  RECIBIDO
+  EN_EVALUACION
+  EN_EJECUCION
+  FINALIZADO
+  COMPLETADO
+}
+
+enum tipoEvidencia {
+  PROBLEMA
+  SOLUCION
+}

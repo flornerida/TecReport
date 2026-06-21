@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE `FotoReporte` MODIFY `urlFoto` TEXT NULL;
+
+-- AlterTable
+ALTER TABLE `User` MODIFY `role` ENUM('ADMIN', 'TECNICO', 'CIUDADANO') NOT NULL DEFAULT 'CIUDADANO';

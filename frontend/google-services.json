@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "878539085490",
+    "project_id": "incidencias-45a8a",
+    "storage_bucket": "incidencias-45a8a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:878539085490:android:e434f4e21efa89112f5bab",
+        "android_client_info": {
+          "package_name": "com.nerida.report"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAD-itp5HEYHgJ_ZcRmHyz36T_oK3Vz0aM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
