@@ -1,0 +1,30 @@
+services:
+  mariadb_bigander:
+    image: mariadb:11
+    container_name: mariadb_bigander
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: reportedb
+      MYSQL_USER: admin_incidencias
+      MYSQL_PASSWORD: incidencias123
+    ports:
+      - "3308:3306"  # Cambiado de 3307 a 3308
+    volumes:
+      - mariadb_bigander_data:/var/lib/mysql
+
+  phpmyadmin_bigander:
+    image: phpmyadmin:latest
+    container_name: phpmyadmin_bigander
+    restart: always
+    environment:
+      PMA_HOST: mariadb_bigander
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: rootpassword
+    ports:
+      - "8083:80"  # Cambiado de 8082 a 8083
+    depends_on:
+      - mariadb_bigander
+
+volumes:
+  mariadb_bigander_data:
