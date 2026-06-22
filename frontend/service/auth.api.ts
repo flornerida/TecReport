@@ -185,13 +185,9 @@ export const login = async (loginData: LoginData): Promise<ApiResponse<{ token: 
   try {
     console.log('🔐 Intentando login:', loginData.email);
     
-    const response = await fetch(`${API_URL}/auth/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(loginData)
-    });
+    const response = await apiClient.post('/auth/login', loginData);
+    const data = response.data;
     
-    const data = await response.json();
     console.log('📡 Respuesta login:', data);
     
     if (data.success) {
@@ -219,9 +215,9 @@ export const login = async (loginData: LoginData): Promise<ApiResponse<{ token: 
       };
     }
     return data;
-  } catch (error) {
-    console.error('❌ Error en login:', error);
-    return { success: false, message: 'Error de conexión con el servidor' };
+  } catch (error: any) {
+    console.error('❌ Error en login:', error.response?.data || error.message);
+    return { success: false, message: error.response?.data?.message || 'Error de conexión con el servidor' };
   }
 };
 
@@ -236,13 +232,8 @@ export const register = async (registerData: RegisterData): Promise<ApiResponse<
       cargo: registerData.cargo
     };
 
-    const response = await fetch(`${API_URL}/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-
-    const data = await response.json();
+    const response = await apiClient.post('/auth/register', payload);
+    const data = response.data;
 
     if (data.success) {
       return {
@@ -252,9 +243,9 @@ export const register = async (registerData: RegisterData): Promise<ApiResponse<
       };
     }
     return data;
-  } catch (error) {
-    console.error('❌ Error en register:', error);
-    return { success: false, message: 'Error de conexión con el servidor' };
+  } catch (error: any) {
+    console.error('❌ Error en register:', error.response?.data || error.message);
+    return { success: false, message: error.response?.data?.message || 'Error de conexión con el servidor' };
   }
 };
 
