@@ -1,6 +1,8 @@
 import { API_URL } from '../config/api.config';
 import apiClient from '../config/apiClient';
-import { getCurrentUser, setCurrentUser, getToken, logout } from '../config/auth.state';
+import { getCurrentUser, setCurrentUser, getToken, logout, updateCurrentUser } from '../config/auth.state';
+
+export { getCurrentUser, setCurrentUser, getToken, logout, updateCurrentUser };
 
 export type Rol = 'ADMIN' | 'TECNICO' | 'USUARIO';
 export type CategoriaIncidencia = 'HARDWARE' | 'SOFTWARE' | 'RED' | 'OTRO';
@@ -133,22 +135,18 @@ interface ApiResponse<T> {
   message?: string;
 }
 
-// ========== ESTADO DE SESIÓN ==========
-
-export { getCurrentUser, setCurrentUser, getToken, logout };
-
 // ========== VERIFICACIÓN DE ROLES ==========
 
 export const isAdmin = (): boolean => {
-  return currentUser?.rol === 'ADMIN';
+  return getCurrentUser()?.rol === 'ADMIN';
 };
 
 export const isTecnico = (): boolean => {
-  return currentUser?.rol === 'TECNICO';
+  return getCurrentUser()?.rol === 'TECNICO';
 };
 
 export const isUsuario = (): boolean => {
-  return currentUser?.rol === 'USUARIO';
+  return getCurrentUser()?.rol === 'USUARIO';
 };
 
 // ========== AUTENTICACIÓN ==========
@@ -219,11 +217,6 @@ export const register = async (registerData: RegisterData): Promise<ApiResponse<
     console.error('❌ Error en register:', error.response?.data || error.message);
     return { success: false, message: error.response?.data?.message || 'Error de conexión con el servidor' };
   }
-};
-
-export const logout = (): void => {
-  setCurrentUser(null);
-  console.log('🔴 Sesión cerrada manualmente');
 };
 
 // ========== INCIDENCIAS ==========
@@ -757,7 +750,7 @@ export const actualizarPerfil = async (data: {
     });
 
     const result = await response.json();
-    if (result.success && result.data?.nombre && currentUser) {
+    if (result.success && result.data?.nombre && getCurrentUser()) {
       updateCurrentUser({ nombre: result.data.nombre });
     }
     return result;
