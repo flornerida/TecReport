@@ -209,6 +209,7 @@ router.post("/forgot-password", async (req, res) => {
         expiresAt: new Date(Date.now() + 10 * 60 * 1000)
       },
       create: {
+        usuarioId: usuario.id,
         email: usuario.correo,
         token: code,
         expiresAt: new Date(Date.now() + 10 * 60 * 1000)
