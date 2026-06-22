@@ -1,5 +1,6 @@
 import { API_URL } from '../config/api.config';
 import apiClient from '../config/apiClient';
+import { getCurrentUser, setCurrentUser, getToken, logout } from '../config/auth.state';
 
 export type Rol = 'ADMIN' | 'TECNICO' | 'USUARIO';
 export type CategoriaIncidencia = 'HARDWARE' | 'SOFTWARE' | 'RED' | 'OTRO';
@@ -134,36 +135,7 @@ interface ApiResponse<T> {
 
 // ========== ESTADO DE SESIÓN ==========
 
-let currentUser: Usuario | null = null;
-
-export const setCurrentUser = (user: Usuario | null) => {
-  currentUser = user;
-  if (user) {
-    console.log('✅ Usuario guardado:', {
-      id: user.id,
-      nombre: user.nombre,
-      email: user.email,
-      rol: user.rol
-    });
-  } else {
-    console.log('🔴 Sesión cerrada');
-  }
-};
-
-export const getCurrentUser = (): Usuario | null => {
-  return currentUser;
-};
-
-export const getToken = (): string | null => {
-  return currentUser?.token || null;
-};
-
-export const updateCurrentUser = (updates: Partial<Usuario>) => {
-  if (currentUser) {
-    currentUser = { ...currentUser, ...updates };
-    console.log('✅ Usuario actualizado en contexto:', currentUser);
-  }
-};
+export { getCurrentUser, setCurrentUser, getToken, logout };
 
 // ========== VERIFICACIÓN DE ROLES ==========
 

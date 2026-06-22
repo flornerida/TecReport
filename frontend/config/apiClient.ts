@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { API_URL } from './api.config';
-import { getToken, logout } from '../service/auth.api';
+import { getToken, logout } from './auth.state';
 import { Alert } from 'react-native';
 
 const apiClient = axios.create({
