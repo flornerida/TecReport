@@ -8,7 +8,7 @@ export const IS_DEV = true;
 /**
  * Dirección IP por defecto para producción.
  */
-const PRODUCTION_IP = '192.168.1.191'; 
+const PRODUCTION_IP = '192.168.1.103'; 
 
 /**
  * Detecta automáticamente la dirección IP del servidor en modo desarrollo.
